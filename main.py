@@ -7,15 +7,18 @@ global connect_main, window
 
 def book_list_view():
     temp_window = default_window()
+    temp_window.minsize(width=500, height=600)
+    center(temp_window)
 
     label_frame = Frame(temp_window, bg='yellow')
-    label_frame.place(relx=0.1, rely=0.2, relwidth=0.8, relheight=0.6)
+    label_frame.place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
 
-    lst = [('ID', 'Назва', 'Автор', 'Статус')]
+    lst = [('ID', 'Назва', 'Рік', 'Жанр', 'Автор', 'Статус')]
 
     try:
         for i in connect_main.find():
-            lst.append((i['bid'], i['title'], i['author'], i['status']))
+            lst.append((i['bid'], i['title'], i['year'], i['genre'], i['author'],
+                        i['status']))
     except:
         messagebox.showinfo("Не вдалося отримати документи з бази даних")
 
@@ -95,15 +98,17 @@ def info_about_book_button(root, bid_info):
     try:
         if connect_main.count_documents(myquery) != 0:
             temp_window = default_window()
+            temp_window.minsize(width=500, height=600)
+            center(temp_window)
 
             label_frame = Frame(temp_window, bg='yellow')
-            label_frame.place(relx=0.1, rely=0.2, relwidth=0.8, relheight=0.6)
+            label_frame.place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
 
-            lst = [('ID', 'Назва', 'Автор', 'Статус')]
+            lst = [('ID', 'Назва', 'Рік', 'Жанр', 'Автор', 'Статус')]
 
             try:
                 document = connect_main.find_one(myquery)
-                lst.append((document['bid'], document['title'], document['author'], document['status']))
+                lst.append((document['bid'], document['title'], document['year'], document['genre'], document['author'], document['status']))
             except:
                 messagebox.showinfo("Не вдалося отримати документи з бази даних")
 
@@ -187,19 +192,23 @@ def delete_book():
     temp_window.mainloop()
 
 
-def new_book_register(root, book_bid_info, book_title_info, book_author_info, book_status_info):
+def new_book_register(root, book_bid_info, book_title_info, book_year_info, book_genre_info, book_author_info, book_status_info):
     bid = book_bid_info.get()
     title = book_title_info.get()
+    year = book_year_info.get()
+    genre = book_genre_info.get().lower()
     author = book_author_info.get()
-    status = book_status_info.get().lower()
+    status = book_status_info.get()
 
-    if not bid or not title or not author or not status:
+    if not bid or not title or not author or not status or not year or not genre:
         messagebox.showinfo('Помилка', "Ви не заповнили одне з поль")
         return
 
     new_book = {
         "bid": bid,
         "title": title,
+        "year": year,
+        "genre": genre,
         "author": author,
         "status": status
     }
@@ -213,6 +222,73 @@ def new_book_register(root, book_bid_info, book_title_info, book_author_info, bo
     root.destroy()
 
 
+def info_about_books_by_genre_button(root, bid_info):
+    bid = bid_info.get()
+
+    if not bid:
+        messagebox.showinfo('Помилка', "Ви не заповнили поле")
+        return
+
+    root.destroy()
+
+    myquery = {"genre": bid}
+    try:
+        if connect_main.count_documents(myquery) != 0:
+            temp_window = default_window()
+            temp_window.minsize(width=500, height=600)
+            center(temp_window)
+
+            label_frame = Frame(temp_window, bg='yellow')
+            label_frame.place(relx=0.0, rely=0.2, relwidth=1.0, relheight=0.6)
+
+            lst = [('ID', 'Назва', 'Рік', 'Жанр', 'Автор', 'Статус')]
+
+            try:
+                for document in connect_main.find(myquery):
+                    lst.append((document['bid'], document['title'], document['year'], document['genre'], document['author'], document['status']))
+            except:
+                messagebox.showinfo("Не вдалося отримати документи з бази даних")
+
+            total_rows = len(lst)
+            total_columns = len(lst[0])
+
+            for i in range(total_rows):
+                for j in range(total_columns):
+                    e = Entry(label_frame, width=14, fg='blue')
+
+                    e.grid(row=i, column=j)
+                    e.insert(END, lst[i][j])
+
+            quit_button = Button(temp_window, text="Вийти", bg='white', fg='black', command=temp_window.destroy)
+            quit_button.place(relx=0.4, rely=0.9, relwidth=0.18, relheight=0.08)
+
+            temp_window.mainloop()
+        else:
+            messagebox.showinfo("Помилка", "ID книги відсутній")
+    except:
+        messagebox.showinfo("Помилка", "Не вдається отримати ID книги")
+
+def get_info_by_genre():
+    temp_window = default_window()
+
+    label_frame = Frame(temp_window, bg='yellow')
+    label_frame.place(relx=0.1, rely=0.2, relwidth=0.8, relheight=0.6)
+
+    book_id_label = Label(label_frame, text="Жанр: ", bg='white', fg='black')
+    book_id_label.place(relx=0.05, rely=0.5)
+
+    book_title_info = Entry(label_frame)
+    book_title_info.place(relx=0.3, rely=0.5, relwidth=0.62)
+
+    submit_button = Button(temp_window, text="Пошук", bg='white', fg='black',
+                           command=lambda: info_about_books_by_genre_button(window, book_title_info))
+    submit_button.place(relx=0.28, rely=0.9, relwidth=0.18, relheight=0.08)
+
+    quit_button = Button(temp_window, text="Вийти", bg='white', fg='black', command=temp_window.destroy)
+    quit_button.place(relx=0.53, rely=0.9, relwidth=0.18, relheight=0.08)
+
+    temp_window.mainloop()
+
 def add_new_book():
     temp_window = default_window()
 
@@ -220,31 +296,44 @@ def add_new_book():
     label_frame.place(relx=0.1, rely=0.2, relwidth=0.8, relheight=0.6)
 
     book_id_label = Label(label_frame, text="ID книги: ", bg='white', fg='black')
-    book_id_label.place(relx=0.05, rely=0.2, relheight=0.08)
+    book_id_label.place(relx=0.05, rely=0.05, relheight=0.08)
 
     book_id_info = Entry(label_frame)
-    book_id_info.place(relx=0.3, rely=0.2, relwidth=0.62, relheight=0.08)
+    book_id_info.place(relx=0.3, rely=0.05, relwidth=0.62, relheight=0.08)
 
     book_title_label = Label(label_frame, text="Назва: ", bg='white', fg='black')
-    book_title_label.place(relx=0.05, rely=0.35, relheight=0.08)
+    book_title_label.place(relx=0.05, rely=0.2, relheight=0.08)
 
     book_title_info = Entry(label_frame)
-    book_title_info.place(relx=0.3, rely=0.35, relwidth=0.62, relheight=0.08)
+    book_title_info.place(relx=0.3, rely=0.2, relwidth=0.62, relheight=0.08)
+
+    book_year_label = Label(label_frame, text="Рік: ", bg='white', fg='black')
+    book_year_label.place(relx=0.05, rely=0.35, relheight=0.08)
+
+    book_year_info = Entry(label_frame)
+    book_year_info.place(relx=0.3, rely=0.35, relwidth=0.62, relheight=0.08)
+
+    book_genre_label = Label(label_frame, text="Жанр: ", bg='white', fg='black')
+    book_genre_label.place(relx=0.05, rely=0.50, relheight=0.08)
+
+    book_genre_info = Entry(label_frame)
+    book_genre_info.place(relx=0.3, rely=0.50, relwidth=0.62, relheight=0.08)
 
     book_author_label = Label(label_frame, text="Автор: ", bg='white', fg='black')
-    book_author_label.place(relx=0.05, rely=0.50, relheight=0.08)
+    book_author_label.place(relx=0.05, rely=0.65, relheight=0.08)
 
     book_author_info = Entry(label_frame)
-    book_author_info.place(relx=0.3, rely=0.50, relwidth=0.62, relheight=0.08)
+    book_author_info.place(relx=0.3, rely=0.65, relwidth=0.62, relheight=0.08)
 
     book_status_label = Label(label_frame, text="Статус: ", bg='white', fg='black')
-    book_status_label.place(relx=0.05, rely=0.65, relheight=0.08)
+    book_status_label.place(relx=0.05, rely=0.80, relheight=0.08)
 
     book_status_info = Entry(label_frame)
-    book_status_info.place(relx=0.3, rely=0.65, relwidth=0.62, relheight=0.08)
+    book_status_info.place(relx=0.3, rely=0.80, relwidth=0.62, relheight=0.08)
 
     submit_button = Button(temp_window, text="Добавити", bg='white', fg='black',
-                           command=lambda: new_book_register(temp_window, book_id_info, book_title_info, book_author_info,
+                           command=lambda: new_book_register(temp_window, book_id_info, book_title_info,
+                                                             book_year_info, book_genre_info, book_author_info,
                                                              book_status_info))
     submit_button.place(relx=0.28, rely=0.9, relwidth=0.18, relheight=0.08)
 
@@ -284,7 +373,7 @@ def initialize_buttons(window):
     info_book_button = Button(window, text="Дізнатися інформацію", bg='white', fg='black', command=info_about_book)
     info_book_button.place(relx=0.28, rely=0.5, relwidth=0.45, relheight=0.1)
 
-    info_by_genre_book_button = Button(window, text="Знайти по жанру", bg='white', fg='black', command=window.destroy)
+    info_by_genre_book_button = Button(window, text="Знайти по жанру", bg='white', fg='black', command=get_info_by_genre)
     info_by_genre_book_button.place(relx=0.28, rely=0.6, relwidth=0.45, relheight=0.1)
 
     quit_button = Button(window, text="Вийти", bg='white', fg='black', command=window.destroy)
