@@ -223,7 +223,7 @@ def new_book_register(root, book_bid_info, book_title_info, book_year_info, book
 
 
 def info_about_books_by_genre_button(root, bid_info):
-    bid = bid_info.get()
+    bid = bid_info.get().lower()
 
     if not bid:
         messagebox.showinfo('Помилка', "Ви не заповнили поле")
