@@ -3,8 +3,10 @@ from tkinter import messagebox
 
 from pymongo import MongoClient
 
+# Глобальні змінні
 global connect_main, window
 
+# Метод, який показує інформацію о всіх книгах
 def book_list_view():
     temp_window = default_window()
     temp_window.minsize(width=500, height=600)
@@ -37,6 +39,7 @@ def book_list_view():
 
     temp_window.mainloop()
 
+# Метод, який змінює статус книги у базу даних
 def status_book_button(root, bid_info, status_info):
     bid = bid_info.get()
     status = status_info.get()
@@ -58,6 +61,7 @@ def status_book_button(root, bid_info, status_info):
 
     root.destroy()
 
+# Метод, який в подальшому змінює статус книги у базу даних, створуює нове вікно
 def status_book():
     temp_window = default_window()
 
@@ -84,7 +88,7 @@ def status_book():
 
     temp_window.mainloop()
 
-
+# Метод, який в виводить інформацію про книги з базу даних, створуює таблицю
 def info_about_book_button(root, bid_info):
     bid = bid_info.get()
 
@@ -131,6 +135,7 @@ def info_about_book_button(root, bid_info):
     except:
         messagebox.showinfo("Помилка", "Не вдається отримати ID книги")
 
+# Метод, який в подальшому виводить інформацію про книги з базу даних, створуює нове вікно
 def info_about_book():
     temp_window = default_window()
 
@@ -151,7 +156,7 @@ def info_about_book():
 
     temp_window.mainloop()
 
-
+# Метод, який видаляє книгу з бази даних
 def delete_book_button(root, book_title_info):
     bid = book_title_info.get()
 
@@ -169,7 +174,7 @@ def delete_book_button(root, book_title_info):
 
     root.destroy()
 
-
+# Метод, який в подальшому працює з видаленням книги з бази даних, створуює нове вікно
 def delete_book():
     temp_window = default_window()
 
@@ -191,7 +196,7 @@ def delete_book():
 
     temp_window.mainloop()
 
-
+# Метод, який працює з додаванням книги в базу даних
 def new_book_register(root, book_bid_info, book_title_info, book_year_info, book_genre_info, book_author_info, book_status_info):
     bid = book_bid_info.get()
     title = book_title_info.get()
@@ -221,7 +226,7 @@ def new_book_register(root, book_bid_info, book_title_info, book_year_info, book
 
     root.destroy()
 
-
+# Метод для кнопки у вікні genre, отримуює дані з бази даних і виводить на екран
 def info_about_books_by_genre_button(root, bid_info):
     bid = bid_info.get().lower()
 
@@ -268,6 +273,7 @@ def info_about_books_by_genre_button(root, bid_info):
     except:
         messagebox.showinfo("Помилка", "Не вдається отримати ID книги")
 
+# Метод, який в подальшому працює з отриманням інформації з бази даних, створуює нове вікно
 def get_info_by_genre():
     temp_window = default_window()
 
@@ -289,6 +295,7 @@ def get_info_by_genre():
 
     temp_window.mainloop()
 
+# Метод, який в подальшому працює з додаванням книги в базу даних, створуює нове вікно
 def add_new_book():
     temp_window = default_window()
 
@@ -342,7 +349,7 @@ def add_new_book():
 
     temp_window.mainloop()
 
-
+# Метод для центризування вікна по середині екрану
 def center(win):
     win.update_idletasks()
     width = win.winfo_width()
@@ -357,6 +364,7 @@ def center(win):
     win.deiconify()
 
 
+# Метод додавання кнопок на вікно
 def initialize_buttons(window):
     add_book_button = Button(window, text="Добавити книгу", bg='white', fg='black', command=add_new_book)
     add_book_button.place(relx=0.28, rely=0.1, relwidth=0.45, relheight=0.1)
@@ -379,25 +387,33 @@ def initialize_buttons(window):
     quit_button = Button(window, text="Вийти", bg='white', fg='black', command=window.destroy)
     quit_button.place(relx=0.28, rely=0.7, relwidth=0.45, relheight=0.1)
 
-
+# Метод для створення вікна
 def default_window():
     root = Tk()
     root.title("Система управління бібліотекою")
+    # Розмір вікна
     root.minsize(width=400, height=600)
+    # Вимкнув кнопку maximize
     root.resizable(0, 0)
     center(root)
     return root
 
-
+# Створюємо нове вікно за допомогою бібліотеки tkinter
 window = default_window()
+# Ініціалізуємо кнопки (добавляємо кнопки, вивів окремим методом)
 initialize_buttons(window)
 
+# String підключення до бази MongoDB
 CONNECTION_STRING = "mongodb+srv://afekvova:4267242672AfeK@cluster.3kqic.mongodb.net/?retryWrites=true&w=majority"
 
+# Створюю клієнт MongoDB
 client = MongoClient(CONNECTION_STRING)
+# Тут потрібна перевірка чи підключився клієнт до бази :)
+# Отримую базу university
 database = client['university']
+# Отримую колекцію library
 connect_main = database['library']
-
+# Запускаю цикл обробки подій
 window.mainloop()
 
 # Спроба використати PyQt6
