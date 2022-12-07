@@ -284,8 +284,11 @@ def initialize_buttons(window):
     info_book_button = Button(window, text="Дізнатися інформацію", bg='white', fg='black', command=info_about_book)
     info_book_button.place(relx=0.28, rely=0.5, relwidth=0.45, relheight=0.1)
 
-    quit_book = Button(window, text="Вийти", bg='white', fg='black', command=window.destroy)
-    quit_book.place(relx=0.28, rely=0.6, relwidth=0.45, relheight=0.1)
+    info_by_genre_book_button = Button(window, text="Знайти по жанру", bg='white', fg='black', command=window.destroy)
+    info_by_genre_book_button.place(relx=0.28, rely=0.6, relwidth=0.45, relheight=0.1)
+
+    quit_button = Button(window, text="Вийти", bg='white', fg='black', command=window.destroy)
+    quit_button.place(relx=0.28, rely=0.7, relwidth=0.45, relheight=0.1)
 
 
 def default_window():
